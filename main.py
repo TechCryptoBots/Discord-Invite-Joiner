@@ -31,6 +31,7 @@ def enter_server(invite_code, account=None, session=None):
 
     invite_link = f"https://discord.com/api/v9/invites/{invite_code}"
     r = session.post(invite_link)
+    return r.status_code == 200 or r.status_code == 204
 
 
 def react_to_message(message_url, account=None, session=None):
@@ -62,11 +63,10 @@ def accept_rules(server_id, account=None, session=None):
     data = {"form_fields": rules, "version": rules_response_json["version"]}
     r = session.put(url=accept_url, data=json.dumps(data),
                     headers={"Content-Type": "application/json"})
-
+    return r.status_code == 200 or r.status_code == 204
 
 def start(config):
 
-   
     invite_code = config["invite_code"]
     verification_reaction_url = config["verification_reaction"]
     giveaway_reaction_url = config["giveaway_reaction"]
@@ -76,31 +76,44 @@ def start(config):
     loaded_accounts = AccountLoader("accounts.txt").load_accounts()
 
     logger.info("Включаем бота...")
+    successful_server_enter = 0
     successful_verification = 0
     successful_giveaway = 0
     for account in tqdm(loaded_accounts):
         session = create_discord_session(account)
 
         # Enter server
-        enter_server(invite_code=invite_code, session=session)
+        if enter_server(invite_code=invite_code, session=session):
+            successful_server_enter += 1
 
         # If a server has rules, accept them
         if accept_server_rules:
             accept_rules(server_id=server_id, session=session)
 
         # Verify account on server
-        verification_success = react_to_message(
-            verification_reaction_url, session=session)
-        if verification_success:
-            successful_verification += 1
-
-        sleep(1)
+        if verification_reaction_url != None:
+            if react_to_message(
+                verification_reaction_url, session=session):
+                successful_verification += 1
+            sleep(0.5)
 
         # Enter giveaway
-        raffle_success = react_to_message(
-            giveaway_reaction_url, session=session)
-        if raffle_success:
-            successful_giveaway += 1
+        if giveaway_reaction_url != None:
+            if react_to_message(
+                giveaway_reaction_url, session=session):
+                successful_giveaway += 1
+
+    if successful_server_enter == len(loaded_accounts):
+        logger.success("Все аккаунты успешно зашли на сервер")
+    else:
+        logger.warning(f"Зашел на сервер с {successful_server_enter}/{len(loaded_accounts)} аккаунтов")
+
+    if successful_verification == len(loaded_accounts):
+        logger.success("Все аккаунты успешно верифицировались")
+    else:
+        logger.warning(
+            f"Верифицировалсь {successful_giveaway}/{len(loaded_accounts)} аккаунтов")
+
 
     if successful_giveaway == len(loaded_accounts):
         logger.success("Все аккаунты успешно нажали на реакцию для гива")
