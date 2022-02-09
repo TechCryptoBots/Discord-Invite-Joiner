@@ -1,5 +1,5 @@
-invite_code: fUgSmvB2
-server_id: 928595979698044958
-accept_server_rules: false
-verification_reaction: https://discord.com/api/v9/channels/928595980939587593/messages/928600902334566430/reactions/%F0%9F%8D%AC/%40me
-giveaway_reaction: https://discord.com/api/v9/channels/928595981077979167/messages/938234048906686484/reactions/%F0%9F%9A%80/%40me
+invite_code: abcdefg # код из инвайта
+server_id: 1234567890 # id сервера
+accept_server_rules: false # принимать правила сервера? (true если на сервере есть правила)
+verification_reaction: https://discord.com/api/v9/channels/blabla # ссылка на первую реакцию (к примеру верификация)
+giveaway_reaction: https://discord.com/api/v9/channels/blabla # ссылка на вторую реакцию (к примеру участие в розыгрыше)
