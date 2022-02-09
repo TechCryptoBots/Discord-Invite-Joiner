@@ -7,6 +7,7 @@ from sys import stderr
 import json
 import yaml
 import requests
+import random
 
 
 def create_discord_session(account: Account):
@@ -30,7 +31,7 @@ def enter_server(invite_code, account=None, session=None):
 
     invite_link = f"https://discord.com/api/v9/invites/{invite_code}"
     r = session.post(invite_link)
-    
+
 
 def react_to_message(message_url, account=None, session=None):
     if not session:
@@ -62,7 +63,10 @@ def accept_rules(server_id, account=None, session=None):
     r = session.put(url=accept_url, data=json.dumps(data),
                     headers={"Content-Type": "application/json"})
 
+
 def start(config):
+
+   
     invite_code = config["invite_code"]
     verification_reaction_url = config["verification_reaction"]
     giveaway_reaction_url = config["giveaway_reaction"]
@@ -104,17 +108,28 @@ def start(config):
         logger.warning(
             f"Зашел в гив с {successful_giveaway}/{len(loaded_accounts)} аккаунтов")
 
+    
+
 
 if __name__ == "__main__":
     logger.remove()
     logger.add(
-        stderr, format="<white>{time:HH:mm:ss}</white> | <level>{level: <8}</level> | <cyan>{line}</cyan> - <white>{message}</white>")
+        stderr, format="<white>{time:HH:mm:ss}</white> | <level>{level: <8}</level> | <white>{message}</white>")
+
+    random_number = random.randint(0, 19)
+    if random_number == 5:
+        logger.warning("Bot created by @tech_crypt0 (если вы купили этого бота или получили его в приватке, админ вас обманывает, бот бесплатный в нашем канале)")
+
 
     with open("config.yaml", "r", encoding="utf-8") as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
         logger.info("Успешно прочитал конфиг")
-        
+
     start(config)
     
+    if random_number == 5:
+        logger.warning("Bot created by @tech_crypt0 (если вы купили этого бота или получили его в приватке, админ вас обманывает, бот бесплатный в нашем канале)")
+
+
     print("Нажмите ENTER чтобы выйти")
     input()
