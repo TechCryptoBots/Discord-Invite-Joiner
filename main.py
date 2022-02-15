@@ -31,7 +31,7 @@ def enter_server(invite_code, account=None, session=None):
 
     invite_link = f"https://discord.com/api/v9/invites/{invite_code}"
     r = session.post(invite_link)
-    return r.status_code == 200 or r.status_code == 204
+    return r.status_code >= 200 or r.status_code < 300
 
 
 def react_to_message(message_url, account=None, session=None):
@@ -42,7 +42,7 @@ def react_to_message(message_url, account=None, session=None):
             raise ArgumentError("No account/session provided")
 
     r = session.put(message_url)
-    return r.status_code == 200 or r.status_code == 204
+    return r.status_code >= 200 or r.status_code < 300
 
 
 def accept_rules(server_id, account=None, session=None):
@@ -63,7 +63,7 @@ def accept_rules(server_id, account=None, session=None):
     data = {"form_fields": rules, "version": rules_response_json["version"]}
     r = session.put(url=accept_url, data=json.dumps(data),
                     headers={"Content-Type": "application/json"})
-    return r.status_code == 200 or r.status_code == 204
+    return r.status_code >= 200 or r.status_code < 300
 
 def start(config):
 
@@ -73,7 +73,7 @@ def start(config):
     server_id = config["server_id"]
     accept_server_rules = config["accept_server_rules"]
 
-    loaded_accounts = AccountLoader("accounts.txt").load_accounts()
+    loaded_accounts = AccountLoader("accounts.txt", proxy_file="proxy.txt").load_accounts()
 
     logger.info("Включаем бота...")
     successful_server_enter = 0
